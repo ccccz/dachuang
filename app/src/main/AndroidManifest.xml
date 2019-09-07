@@ -20,6 +20,7 @@
 
         <meta-data android:name="com.amap.api.v2.apikey" android:value="c39fde950bac9d113c4cc8c86949e2da">
         </meta-data>
+        <service android:name="com.amap.api.location.APSService"></service>
     </application>
 
     <!--允许程序打开网络套接字-->
