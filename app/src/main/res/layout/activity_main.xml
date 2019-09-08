@@ -4,15 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@color/black">
 
     <com.amap.api.maps.MapView
         android:id="@+id/map"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
 
-    <SearchView
-        android:id="@+id/mySearch"
+    </com.amap.api.maps.MapView>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_margin="20dp"
@@ -22,58 +24,25 @@
         android:inputType="number"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="@+id/map"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0" >
 
-<!--    <LinearLayout-->
-<!--        android:layout_width="30dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginBottom="8dp"-->
-<!--        android:layout_marginEnd="16dp"-->
-<!--        android:layout_marginTop="8dp"-->
-<!--        android:orientation="vertical"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintVertical_bias="0.222">-->
+        <SearchView
+            android:id="@+id/mySearch"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="5"
+            android:queryHint="@string/searchQuery"
+            />
 
-<!--        <ImageButton-->
-<!--            android:id="@+id/saveButton"-->
-<!--            android:layout_width="30dp"-->
-<!--            android:layout_height="30dp"-->
-<!--            android:layout_marginBottom="8dp"-->
-<!--            android:layout_marginEnd="8dp"-->
-<!--            android:layout_marginStart="8dp"-->
-<!--            android:layout_marginTop="8dp"-->
-<!--            android:background="@drawable/update_circle"-->
-<!--            android:scaleType="centerInside"-->
-<!--            android:src="@drawable/save" />-->
-
-<!--        <ImageButton-->
-<!--            android:id="@+id/updataButton"-->
-<!--            android:layout_width="30dp"-->
-<!--            android:layout_height="30dp"-->
-<!--            android:background="@drawable/update_circle"-->
-<!--            android:scaleType="centerInside"-->
-<!--            android:src="@drawable/remove" />-->
-
-<!--        <ImageButton-->
-<!--            android:id="@+id/locaButton"-->
-<!--            android:layout_width="30dp"-->
-<!--            android:layout_height="30dp"-->
-<!--            android:background="@drawable/update_circle"-->
-<!--            android:scaleType="centerInside"-->
-<!--            android:src="@drawable/locat" />-->
-
-<!--        <ImageButton-->
-<!--            android:id="@+id/hisButton"-->
-<!--            android:layout_width="30dp"-->
-<!--            android:layout_height="30dp"-->
-<!--            android:background="@drawable/update_circle"-->
-<!--            android:scaleType="centerInside"-->
-<!--            android:src="@drawable/history" />-->
-
-
-<!--    </LinearLayout>-->
+        <Button
+            android:id="@+id/mySearchBtn"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="2dp"
+            android:text="@string/search"
+            android:background="@drawable/serach_circle"/>
+    </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -83,7 +52,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
-        android:background="@drawable/serach_circle">
+        android:background="@drawable/serach_circle"
+        android:visibility="gone">
 
 
     <ImageButton
@@ -103,4 +73,105 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        android:background="@drawable/serach_circle"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3"
+            android:layout_marginLeft="1dp"
+            android:layout_marginRight="1dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/serach_circle"
+                android:visibility="gone"/>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/serach_circle"
+                android:visibility="gone"/>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/serach_circle"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="@string/confirm"
+            android:background="@drawable/serach_circle"/>
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+    <!--    <LinearLayout-->
+    <!--        android:layout_width="30dp"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginBottom="8dp"-->
+    <!--        android:layout_marginEnd="16dp"-->
+    <!--        android:layout_marginTop="8dp"-->
+    <!--        android:orientation="vertical"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent"-->
+    <!--        app:layout_constraintVertical_bias="0.222">-->
+
+    <!--        <ImageButton-->
+    <!--            android:id="@+id/saveButton"-->
+    <!--            android:layout_width="30dp"-->
+    <!--            android:layout_height="30dp"-->
+    <!--            android:layout_marginBottom="8dp"-->
+    <!--            android:layout_marginEnd="8dp"-->
+    <!--            android:layout_marginStart="8dp"-->
+    <!--            android:layout_marginTop="8dp"-->
+    <!--            android:background="@drawable/update_circle"-->
+    <!--            android:scaleType="centerInside"-->
+    <!--            android:src="@drawable/save" />-->
+
+    <!--        <ImageButton-->
+    <!--            android:id="@+id/updataButton"-->
+    <!--            android:layout_width="30dp"-->
+    <!--            android:layout_height="30dp"-->
+    <!--            android:background="@drawable/update_circle"-->
+    <!--            android:scaleType="centerInside"-->
+    <!--            android:src="@drawable/remove" />-->
+
+    <!--        <ImageButton-->
+    <!--            android:id="@+id/locaButton"-->
+    <!--            android:layout_width="30dp"-->
+    <!--            android:layout_height="30dp"-->
+    <!--            android:background="@drawable/update_circle"-->
+    <!--            android:scaleType="centerInside"-->
+    <!--            android:src="@drawable/locat" />-->
+
+    <!--        <ImageButton-->
+    <!--            android:id="@+id/hisButton"-->
+    <!--            android:layout_width="30dp"-->
+    <!--            android:layout_height="30dp"-->
+    <!--            android:background="@drawable/update_circle"-->
+    <!--            android:scaleType="centerInside"-->
+    <!--            android:src="@drawable/history" />-->
+
+
+    <!--    </LinearLayout>-->

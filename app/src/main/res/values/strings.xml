@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Dachuang</string>
+    <string name="search">搜索</string>
+    <string name="searchQuery">请输入单个字母或数字...</string>
+    <string name="confirm">确定</string>
 </resources>

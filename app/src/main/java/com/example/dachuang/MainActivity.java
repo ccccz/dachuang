@@ -8,10 +8,14 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.SearchView;
+import android.widget.Toast;
 
 
 import com.amap.api.location.AMapLocation;
@@ -46,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private List<LatLng> latLngs; //行走点标记
     private LatLng latLng;
     private Polyline polyline;
+    private SearchView mSearchView;
 
 
     @Override
@@ -56,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         mapView.onCreate(savedInstanceState);
         mButton=(ImageButton) findViewById(R.id.mButton);
         isStart=false;
+        mSearchView=(SearchView)findViewById(R.id.mySearch);
 
 
         init();
@@ -67,6 +73,9 @@ public class MainActivity extends AppCompatActivity {
          */
         uiSettings=aMap.getUiSettings();
         uiSettings.setZoomControlsEnabled(false);
+        EditText et = (EditText)mSearchView.findViewById(mSearchView.getContext().getResources()
+                .getIdentifier("android:id/search_src_text", null, null));
+        et.setFilters(new InputFilter[] { new InputFilter.LengthFilter(1) });
 
         /**
          * 获取定位权限
@@ -103,6 +112,45 @@ public class MainActivity extends AppCompatActivity {
                     System.out.println(latLngs.size());
                 }
                 isStart=!isStart;
+            }
+        });
+
+        /**
+         * searchView点击处理
+         */
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                System.out.println("搜索       "+s);
+                if(s.equals("s")){
+                    List<LatLng> latLngs1=new ArrayList<>();
+                    List<LatLng> latLngs2=new ArrayList<>();
+                    List<LatLng> latLngs3=new ArrayList<>();
+
+                    latLngs1.add(new LatLng(32.051814,118.782831));
+                    latLngs1.add(new LatLng(32.051732,118.782134));
+                    latLngs1.add(new LatLng(32.051423,118.782177));
+                    latLngs1.add(new LatLng(32.051432,118.782874));
+                    latLngs1.add(new LatLng(32.051187,118.782885));
+                    latLngs1.add(new LatLng(32.051141,118.782198));
+
+                    latLngs2.add(new LatLng(118.781479,32.051332));
+                    latLngs2.add(new LatLng(118.781522,32.051114));
+                    latLngs2.add(new LatLng(118.782241,32.051105));
+                    latLngs2.add(new LatLng(118.782187,32.051423));
+                    latLngs2.add(new LatLng(118.782874,32.051487));
+                    latLngs2.add(new LatLng(118.782917,32.051196));
+
+
+                }else{
+                    Toast.makeText(MainActivity.this,"未搜索到路径，请尝试更换搜索内容或更改位置",Toast.LENGTH_SHORT).show();
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
             }
         });
     }
