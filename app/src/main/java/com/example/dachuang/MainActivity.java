@@ -1,12 +1,20 @@
 package com.example.dachuang;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.util.Log;
@@ -14,7 +22,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -23,6 +33,7 @@ import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.amap.api.maps.AMap;
+import com.amap.api.maps.AMapUtils;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.UiSettings;
@@ -31,6 +42,7 @@ import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.maps.model.Polyline;
 import com.amap.api.maps.model.PolylineOptions;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +63,9 @@ public class MainActivity extends AppCompatActivity {
     private LatLng latLng;
     private Polyline polyline;
     private SearchView mSearchView;
+    private Polyline polyline1,polyline2,polyline3;
+    private LinearLayout selectLLayout; //选择路线模块
+    private ConstraintLayout operateCLayout; //主操作模块
 
 
     @Override
@@ -62,11 +77,14 @@ public class MainActivity extends AppCompatActivity {
         mButton=(ImageButton) findViewById(R.id.mButton);
         isStart=false;
         mSearchView=(SearchView)findViewById(R.id.mySearch);
+        selectLLayout=findViewById(R.id.selectModel);
+        operateCLayout=findViewById(R.id.operateModel);
 
 
         init();
         initPoint();
         initLocal();
+        quanxian();
 
         /**
          * 设置控件样式
@@ -78,17 +96,7 @@ public class MainActivity extends AppCompatActivity {
         et.setFilters(new InputFilter[] { new InputFilter.LengthFilter(1) });
 
         /**
-         * 获取定位权限
-         */
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            //申请WRITE_EXTERNAL_STORAGE权限
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                    WRITE_COARSE_LOCATION_REQUEST_CODE);//自定义的code
-        }
-
-        /**
-         * 隐藏状态栏，导航栏，actionbar TODO:目前失效中
+         * 隐藏状态栏，导航栏，actionbar TODO:可能是无效代码，回头修改
          */
         View decorView=getWindow().getDecorView();
         int option = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
@@ -134,14 +142,25 @@ public class MainActivity extends AppCompatActivity {
                     latLngs1.add(new LatLng(32.051187,118.782885));
                     latLngs1.add(new LatLng(32.051141,118.782198));
 
-                    latLngs2.add(new LatLng(118.781479,32.051332));
-                    latLngs2.add(new LatLng(118.781522,32.051114));
-                    latLngs2.add(new LatLng(118.782241,32.051105));
-                    latLngs2.add(new LatLng(118.782187,32.051423));
-                    latLngs2.add(new LatLng(118.782874,32.051487));
-                    latLngs2.add(new LatLng(118.782917,32.051196));
+                    latLngs2.add(new LatLng(32.051332,118.781479));
+                    latLngs2.add(new LatLng(32.051114,118.781522));
+                    latLngs2.add(new LatLng(32.051105,118.782241));
+                    latLngs2.add(new LatLng(32.051423,118.782187));
+                    latLngs2.add(new LatLng(32.051487,118.782874));
+                    latLngs2.add(new LatLng(32.051196,118.782917));
 
-
+                    polyline1=printLine(latLngs1);
+                    polyline2=printAlterLine(latLngs1);
+                    TextView op1=findViewById(R.id.option1);
+                    op1.setOnClickListener(new ButtonListener());
+                    op1.setVisibility(View.VISIBLE);
+                    op1.setText(calcuDes(latLngs1)+"m");
+                    TextView op2=findViewById(R.id.option2);
+                    op2.setOnClickListener(new ButtonListener());
+                    op2.setVisibility(View.VISIBLE);
+                    op2.setText(calcuDes(latLngs2)+"m");
+                    operateCLayout.setVisibility(View.GONE);
+                    selectLLayout.setVisibility(View.VISIBLE);
                 }else{
                     Toast.makeText(MainActivity.this,"未搜索到路径，请尝试更换搜索内容或更改位置",Toast.LENGTH_SHORT).show();
                 }
@@ -188,6 +207,12 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("printLine success");
         return polyline;
     }
+    private Polyline printAlterLine(List<LatLng> ls){
+        Polyline polyline;
+        polyline=aMap.addPolyline(new PolylineOptions().addAll(ls).width(15).color(Color.argb(208, 0, 0, 0)).lineJoinType(PolylineOptions.LineJoinType.LineJoinRound));
+        System.out.println("printLine success");
+        return polyline;
+    }
     private Polyline printRunLine(List<LatLng> ls){
         Polyline polyline;
         polyline=aMap.addPolyline(new PolylineOptions().addAll(ls).width(15).color(Color.argb(255, 255, 241, 0)).lineJoinType(PolylineOptions.LineJoinType.LineJoinRound));
@@ -225,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         mLocationClient.setLocationListener(mLocationListener);
+//        mLocationClient.enableBackgroundLocation(2019,buildNotification());
         //声明AMapLocationClientOption对象，AMapLocationClientOption用来设置发起定位的模式和相关参数
         mLocationClientOption=new AMapLocationClientOption();
         /**
@@ -234,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
         mLocationClientOption.setLocationPurpose(AMapLocationClientOption.AMapLocationPurpose.Sport);
         //设置定位模式
         mLocationClientOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
-        mLocationClientOption.setInterval(3000);
+        mLocationClientOption.setInterval(1000);
 //        mLocationClientOption.setOnceLocation(true);
         if (mLocationClient!=null){
             //应用于AMapLocationClient
@@ -242,6 +268,7 @@ public class MainActivity extends AppCompatActivity {
             //类似于重启的操作，保证场景生效
             mLocationClient.stopLocation();
             mLocationClient.startLocation();
+            mLocationClient.enableBackgroundLocation(2019,buildNotification());
         }
     }
 
@@ -251,11 +278,16 @@ public class MainActivity extends AppCompatActivity {
     private void local(){
         aMap.moveCamera(CameraUpdateFactory.changeLatLng(latLng));
     }
+
+    /**
+     * 活动状态
+     */
     @Override
     protected void onResume() {
         super.onResume();
         mapView.onResume();
         isOK=0;
+        quanxian();
     }
 
     @Override
@@ -276,5 +308,146 @@ public class MainActivity extends AppCompatActivity {
         mapView.onDestroy();
     }
 
+    /**
+     *设置按钮监听
+     */
+    private class ButtonListener implements View.OnClickListener{
+
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()){
+                case R.id.option1:
+                    polyline1.setColor(Color.argb(255, 0, 0, 0));
+                    if(polyline2!=null){
+                        polyline2.setColor(Color.argb(208, 0, 0, 0));
+                    }
+                    if(polyline3!=null){
+                        polyline3.setColor(Color.argb(208, 0, 0, 0));
+                    }
+                    break;
+                case R.id.option2:
+                    polyline1.setColor(Color.argb(208, 0, 0, 0));
+                    polyline2.setColor(Color.argb(255, 0, 0, 0));
+                    if(polyline3!=null){
+                        polyline3.setColor(Color.argb(208, 0, 0, 0));
+                    }
+                    break;
+                case R.id.option3:
+                    polyline1.setColor(Color.argb(208, 0, 0, 0));
+                    polyline2.setColor(Color.argb(208, 0, 0, 0));
+                    polyline3.setColor(Color.argb(255, 0, 0, 0));
+                    break;
+                case R.id.confirmBtn:
+                    if (polyline1.getColor()==Color.argb(208, 0, 0, 0)){
+                        polyline1.setVisible(false);
+                    }
+                    if(polyline2!=null){
+                        if (polyline2.getColor()==Color.argb(208, 0, 0, 0)){
+                            polyline2.setVisible(false);
+                        }
+                    }
+                    if(polyline3!=null){
+                        if (polyline3.getColor()==Color.argb(208, 0, 0, 0)){
+                            polyline3.setVisible(false);
+                        }
+                    }
+                    selectLLayout.setVisibility(View.GONE);
+                    operateCLayout.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    /**
+     * 关于定位权限问题
+     */
+    private static final String NOTIFICATION_CHANNEL_NAME = "BackgroundLocation";
+    private NotificationManager notificationManager = null;
+    private boolean isCreateChannel = false;
+    @SuppressLint("NewApi")
+    private Notification buildNotification() {
+
+        Notification.Builder builder = null;
+        Notification notification = null;
+        if(android.os.Build.VERSION.SDK_INT >= 26) {
+            //Android O上对Notification进行了修改，如果设置的targetSDKVersion>=26建议使用此种方式创建通知栏
+            if (null == notificationManager) {
+                notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            }
+            String channelId = getPackageName();
+            if(!isCreateChannel) {
+                NotificationChannel notificationChannel = new NotificationChannel(channelId,
+                        NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
+                notificationChannel.enableLights(true);//是否在桌面icon右上角展示小圆点
+                notificationChannel.setLightColor(Color.BLUE); //小圆点颜色
+                notificationChannel.setShowBadge(true); //是否在久按桌面图标时显示此渠道的通知
+                notificationManager.createNotificationChannel(notificationChannel);
+                isCreateChannel = true;
+            }
+            builder = new Notification.Builder(getApplicationContext(), channelId);
+        } else {
+            builder = new Notification.Builder(getApplicationContext());
+        }
+        CharSequence charSequence=new String("Dachuang");
+        builder.setSmallIcon(R.drawable.stop)
+                .setContentTitle(charSequence)
+                .setContentText("正在后台运行")
+                .setWhen(System.currentTimeMillis());
+
+        System.out.println("显示后台信息");
+        if (android.os.Build.VERSION.SDK_INT >= 16) {
+            notification = builder.build();
+        } else {
+            return builder.getNotification();
+        }
+        return notification;
+    }
+
+    /**
+     * 关于定位权限问题2
+     */
+    private static final int LOCATION_CODE=1;
+    private LocationManager locationManager;
+    public void quanxian(){
+        locationManager=(LocationManager)MainActivity.this.getSystemService(MainActivity.LOCATION_SERVICE);
+        boolean ok=locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if (ok){
+            System.out.println("检测是否开启定位");
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                //没有权限，申请WRITE_EXTERNAL_STORAGE权限
+                System.out.println("检测到未开启定位");
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                        WRITE_COARSE_LOCATION_REQUEST_CODE);//自定义的code
+            }
+        }else{
+            Toast.makeText(MainActivity.this,"检测到未开启GPS定位服务，请开启定位服务",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    /**
+     * 距离、配速计算
+     */
+    private double calcuDes(LatLng latLngA,LatLng latLngB){
+        return AMapUtils.calculateLineDistance(latLngA,latLngB);
+    }
+    private double calcuDes(List<LatLng> ls){
+        Double res=0.0;
+        for(int i=1;i<ls.size();i++){
+            res=res+calcuDes(ls.get(i-1),ls.get(i));
+        }
+        return res;
+    }
+    private double calcuSpeed(LatLng latLngA,LatLng latLngB){
+        double speed=(1000/calcuDes(latLngA,latLngB))/60;
+        BigDecimal bigDecimal=new BigDecimal(speed);
+        return bigDecimal.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+    }
+    private double calcuSpeed(List<LatLng> ls){
+        double speed=calcuDes(ls)/ls.size();
+        speed=(1000/speed)/60;
+        BigDecimal bigDecimal=new BigDecimal(speed);
+        return bigDecimal.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+    }
 
 }
